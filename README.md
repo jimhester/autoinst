@@ -1,7 +1,7 @@
 # Autoinst
 [![Travis-CI Build Status](https://travis-ci.org/.svg?branch=master)](https://travis-ci.org/)
 
-Automatically install CRAN packages when they are not found
+Automatically install CRAN packages when they are missing.
 
 Simply add the following to your `.Rprofile` and CRAN packages will be automatically installed if they are missing.
 
