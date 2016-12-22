@@ -6,7 +6,7 @@
 autoinst <- function() {
   msg <- paste(lapply(sys.frame(-1)$args, as.character), collapse = "")
   m <- rematch2::re_match(msg, "there is no package called .([[:alnum:].]+).")
-  if (m != -1) {
+  if (!is.na(m)) {
     pkg <- m[[1]]
     pkgs <- available_packages()
     if (!is.na(pkgs[, "Package"][pkg])) {
