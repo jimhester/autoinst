@@ -1,0 +1,12 @@
+Package: autoinst
+Title: Auto Install Packages
+Version: 0.0.0.9000
+Authors@R: person("Jim", "Hester", email = "james.f.hester@gmail.com", role = c("aut", "cre"))
+Description: Automatically install packages when they are not found.
+Depends: R (>= 3.3.2)
+Imports: rematch2
+Remotes: mangothecat/rematch2
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1.9000
