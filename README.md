@@ -1,5 +1,5 @@
 # Autoinst
-[![Travis-CI Build Status](https://travis-ci.org/.svg?branch=master)](https://travis-ci.org/)
+[![Build Status](https://travis-ci.org/jimhester/autoinst.svg?branch=master)](https://travis-ci.org/jimhester/autoinst)
 
 Automatically install CRAN or GitHub packages when they are missing.
 
