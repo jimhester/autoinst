@@ -3,7 +3,7 @@
 
 Automatically install CRAN or GitHub packages when they are missing.
 
-Simply add the following to your `.Rprofile` and packages will be automatically installed if they are missing.
+Simply add the following to your `.Rprofile` and packages will be automatically installed when they fail to load.
 
 ```r
 options(error = autoinst::autoinst)
