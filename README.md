@@ -9,7 +9,7 @@ Simply add the following to your `.Rprofile` and packages will be automatically 
 options(error = autoinst::autoinst)
 ```
 
-Then missing packages will be automatically installed and the failed call re-run.
+Then missing packages will be automatically installed, so you can then simply re-run the call.
 
 ```r
 options(error = autoinst::autoinst)

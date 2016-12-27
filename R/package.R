@@ -33,9 +33,9 @@ autoinst <- function() {
         devtools::install_github(gh_pkgs$pkg_location[matches[as.integer(i)]])
       }
     }
+    message("Can now rerun\n", paste(deparse(sys.call(1)), collapse = "\n"))
   }
 }
-options(error = autoinst)
 
 available_packages <- memoise::memoise(utils::available.packages)
 
