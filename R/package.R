@@ -5,7 +5,7 @@
 #' @export
 autoinst <- function() {
   msg <- paste(lapply(sys.frame(-1)$args, as.character), collapse = "")
-  m <- rematch2::re_match(msg, "there is no package called .([[:alnum:].]+).")
+  m <- rematch2::re_match(msg, gettextf("there is no package called %s", ".([[:alnum:].]+)."))
   if (!is.na(m)) {
     pkg <- m[[1]]
     pkgs <- available_packages()
