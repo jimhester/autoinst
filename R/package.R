@@ -6,8 +6,8 @@
 autoinst <- function() {
   msg <- paste(lapply(sys.frame(-1)$args, as.character), collapse = "")
   m <- rematch2::re_match(msg, gettextf("there is no package called %s", ".([[:alnum:].]+)."))
-  if (!is.na(m)) {
-    pkg <- m[[1]]
+  pkg <- na.omit(m[[1]])
+  if (length(pkg) > 0) {
     pkgs <- available_packages()
     if (!is.na(pkgs[, "Package"][pkg])) {
       message("Installing ", pkg)
@@ -16,7 +16,7 @@ autoinst <- function() {
       if (is.null(tryCatch(utils::packageVersion("devtools"), error = function(e) NULL))) {
         return()
       }
-      gh_pkgs <- gh_pkgs()
+      gh_pkgs <- gh_pkg(pkg)
       matches <- which(pkg == gh_pkgs$pkg_name)
       i <-
         if (length(matches) == 1) {
@@ -39,9 +39,11 @@ autoinst <- function() {
 
 available_packages <- memoise::memoise(utils::available.packages)
 
-gh_pkgs <- memoise::memoise(function() {
-  res <- jsonlite::fromJSON("http://rpkg.gepuro.net/download")
-  res <- res$pkg_list
+gh_pkg <- memoise::memoise(function(pkg) {
+  res <- jsonlite::fromJSON(paste0("http://rpkg-api.gepuro.net/rpkg?q=", pkg))
+  if (length(res) == 0) {
+    return(list(pkg_name = "", pkg_org = ""))
+  }
   res$pkg_location <- res$pkg_name
   res$pkg_org <- vapply(strsplit(res$pkg_location, "/"), `[[`, character(1), 1)
   res$pkg_name <- vapply(strsplit(res$pkg_location, "/"), `[[`, character(1), 2)
