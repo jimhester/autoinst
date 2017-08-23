@@ -7,7 +7,9 @@ autoinst <- function() {
   msg <- paste(lapply(sys.frame(-1)$args, as.character), collapse = "")
   m <- rematch2::re_match(msg, gettextf("there is no package called %s", ".([[:alnum:].]+)."))
   pkg <- na.omit(m[[1]])
-  if (length(pkg) == 0L) return()
+  if (length(pkg) == 0L) {
+    return()
+  }
 
   pkgs <- available_packages()
   if (!is.na(pkgs[, "Package"][pkg])) {
@@ -19,23 +21,26 @@ autoinst <- function() {
     }
     gh_pkgs <- gh_pkg(pkg)
     matches <- which(pkg == gh_pkgs$pkg_name)
-    i <-
-      if (length(matches) == 1) {
-        if (get_answer(sprintf("Install '%s'? (Y/N): ", gh_pkgs$pkg_location[matches]), c("Y", "N")) == "Y") { 1 } else { "N" }
-      } else if (length(matches) > 1) {
-        nums <- as.character(seq_along(matches))
-        width_nums <- max(nchar(nums))
-        cat(multicol(paste0(sprintf(paste0("%", width_nums, "s"), nums), "| ", gh_pkgs$pkg_location[matches])), sep = "")
-        get_answer(sprintf("Which package would you like to install? (1-%d, N): ", length(matches)), c(as.character(seq(1, length(matches))), "N"), "N")
-      } else {
-        message("Package '", pkg, "' does not exist")
-        return()
-      }
-    if (i != "N") {
-      devtools::install_github(gh_pkgs$pkg_location[matches[as.integer(i)]])
-    } else {
+    if (length(matches) == 0) {
+      message("Package '", pkg, "' does not exist")
       return()
     }
+    i <-
+      if (length(matches) == 1) {
+        ans <- get_answer(
+            sprintf("Install '%s'? (Y/N): ", gh_pkgs$pkg_location[matches]),
+            c("Y", "N"), "N")
+        if (ans == "Y") { "1" }
+      } else {
+        display_matches(gh_pkgs$pkg_location[matches])
+        get_answer(
+          sprintf("Which package would you like to install? (1-%d, N): ", length(matches)),
+          c(as.character(seq(1, length(matches))), "N"), "N")
+      }
+    if (i == "N") {
+      return()
+    }
+    devtools::install_github(gh_pkgs$pkg_location[matches[as.integer(i)]])
   }
   message("Can now rerun\n", paste(deparse(sys.call(1)), collapse = "\n"))
 }
@@ -63,6 +68,12 @@ get_answer <- function(msg, allowed, default) {
     if (answer %in% allowed)
       return(answer)
   }
+}
+
+display_matches <- function(matches) {
+  nums <- as.character(seq_along(matches))
+  width_nums <- max(nchar(nums))
+  cat(multicol(paste0(sprintf(paste0("%", width_nums, "s"), nums), "| ", matches)), sep = "")
 }
 
 # From gaborcsardi/crayon/R/utils.r
