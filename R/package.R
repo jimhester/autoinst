@@ -27,7 +27,8 @@ autoinst <- function() {
           cat(multicol(paste0(sprintf(paste0("%", width_nums, "s"), nums), "| ", gh_pkgs$pkg_location[matches])), sep = "")
           get_answer(sprintf("Which package would you like to install? (1-%d, N): ", length(matches)), c(as.character(seq(1, length(matches))), "N"), "N")
         } else {
-          "N"
+          message("Unable to install ", pkg)
+          return()
         }
       if (i != "N") {
         devtools::install_github(gh_pkgs$pkg_location[matches[as.integer(i)]])
