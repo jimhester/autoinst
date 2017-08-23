@@ -7,35 +7,37 @@ autoinst <- function() {
   msg <- paste(lapply(sys.frame(-1)$args, as.character), collapse = "")
   m <- rematch2::re_match(msg, gettextf("there is no package called %s", ".([[:alnum:].]+)."))
   pkg <- na.omit(m[[1]])
-  if (length(pkg) > 0) {
-    pkgs <- available_packages()
-    if (!is.na(pkgs[, "Package"][pkg])) {
-      message("Installing ", pkg)
-      utils::install.packages(pkg, quiet = TRUE)
-    } else {
-      if (is.null(tryCatch(utils::packageVersion("devtools"), error = function(e) NULL))) {
+  if (length(pkg) == 0L) return()
+
+  pkgs <- available_packages()
+  if (!is.na(pkgs[, "Package"][pkg])) {
+    message("Installing ", pkg)
+    utils::install.packages(pkg, quiet = TRUE)
+  } else {
+    if (is.null(tryCatch(utils::packageVersion("devtools"), error = function(e) NULL))) {
+      return()
+    }
+    gh_pkgs <- gh_pkg(pkg)
+    matches <- which(pkg == gh_pkgs$pkg_name)
+    i <-
+      if (length(matches) == 1) {
+        if (get_answer(sprintf("Install '%s'? (Y/N): ", gh_pkgs$pkg_location[matches]), c("Y", "N")) == "Y") { 1 } else { "N" }
+      } else if (length(matches) > 1) {
+        nums <- as.character(seq_along(matches))
+        width_nums <- max(nchar(nums))
+        cat(multicol(paste0(sprintf(paste0("%", width_nums, "s"), nums), "| ", gh_pkgs$pkg_location[matches])), sep = "")
+        get_answer(sprintf("Which package would you like to install? (1-%d, N): ", length(matches)), c(as.character(seq(1, length(matches))), "N"), "N")
+      } else {
+        message("Package '", pkg, "' does not exist")
         return()
       }
-      gh_pkgs <- gh_pkg(pkg)
-      matches <- which(pkg == gh_pkgs$pkg_name)
-      i <-
-        if (length(matches) == 1) {
-          if (get_answer(sprintf("Install '%s'? (Y/N): ", gh_pkgs$pkg_location[matches]), c("Y", "N")) == "Y") { 1 } else { "N" }
-        } else if (length(matches) > 1) {
-          nums <- as.character(seq_along(matches))
-          width_nums <- max(nchar(nums))
-          cat(multicol(paste0(sprintf(paste0("%", width_nums, "s"), nums), "| ", gh_pkgs$pkg_location[matches])), sep = "")
-          get_answer(sprintf("Which package would you like to install? (1-%d, N): ", length(matches)), c(as.character(seq(1, length(matches))), "N"), "N")
-        } else {
-          message("Unable to install ", pkg)
-          return()
-        }
-      if (i != "N") {
-        devtools::install_github(gh_pkgs$pkg_location[matches[as.integer(i)]])
-      }
+    if (i != "N") {
+      devtools::install_github(gh_pkgs$pkg_location[matches[as.integer(i)]])
+    } else {
+      return()
     }
-    message("Can now rerun\n", paste(deparse(sys.call(1)), collapse = "\n"))
   }
+  message("Can now rerun\n", paste(deparse(sys.call(1)), collapse = "\n"))
 }
 
 available_packages <- memoise::memoise(utils::available.packages)
