@@ -1,5 +1,6 @@
 # Autoinst
 [![Build Status](https://travis-ci.org/jimhester/autoinst.svg?branch=master)](https://travis-ci.org/jimhester/autoinst)
+[![lifecycle](https://img.shields.io/badge/lifecycle-works_for_me-ff69b4.svg)](https://blog.codinghorror.com/the-works-on-my-machine-certification-program/)
 
 Automatically install CRAN or GitHub packages when they are missing.
 
